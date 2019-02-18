@@ -1,0 +1,16 @@
+{
+  "name": "intro-to-react",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "mdx-deck slides.mdx"
+  },
+  "keywords": [],
+  "author": "Alasdair Smith <ali@alasdairsmith.co.uk>",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "mdx-deck": "^1.8.2"
+  }
+}

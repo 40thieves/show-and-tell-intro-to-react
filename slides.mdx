@@ -1,0 +1,289 @@
+export { default as theme } from './theme'
+import { Head } from 'mdx-deck'
+import { Split } from 'mdx-deck/layouts'
+
+<Head>
+  <title>Intro to React</title>
+</Head>
+
+# Intro to React
+### Show & Tell - February 2019
+
+---
+
+## Code Your Future class
+
+This is heavily based on the React class I taught a couple of times
+
+If you want to read the longer version - including exercises - you can read it
+[here](https://codeyourfuture.github.io/syllabus-master/react/week-19/lesson.html)
+
+---
+
+## What's the problem?
+
+Updating the DOM manually is verbose, potentially buggy and slow.
+
+```js
+var divNode = document.createElement('div')
+var textNode = document.createTextNode('Hello World')
+divNode.appendChild(textNode)
+
+var rootElement = document.getElementById('root')
+rootElement.appendChild(divNode)
+```
+
+---
+
+### Let's try some React
+
+```js
+const element = React.createElement('div', {
+  children: 'Hello World'
+})
+
+const rootElement = document.getElementById('root')
+ReactDOM.render(element, rootElement)
+```
+
+---
+
+## Now with JSX
+
+```js
+import React from 'react'
+
+const element = <div>Hello World</div>
+
+const rootElement = document.getElementById('root')
+ReactDOM.render(element, rootElement)
+```
+
+[Babel REPL](https://babeljs.io/repl#?babili=false&browsers=&build=&builtIns=false&spec=false&loose=false&code_lz=JYWwDg9gTgLgBAJQKYEMDG8BmUIjgcilQ3wChS0IA7AZ3iQBskQkr4BeOAHgBNgA3AHwAJRgwhwA6tAY8uAej5DylWvBwQYAUSYs2cTjwhoArnpgA6AOZJtu1jABCATwCSPABSEIm_AEpSZHQYABEAeQBZCyIqHiQoD0ZmBwAaOA07ZLY_IA&debug=false&forceAllTransforms=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=true&presets=react&prettier=false&targets=&version=7.3.3)
+
+---
+
+## Interpolation
+
+```js
+<span>{1 + 2 + 3}</span>
+```
+
+```js
+const weather = {
+  temperature: 5,
+  location: 'London'
+}
+<p>The temperature in {weather.location} is {weather.temperature}</p>
+```
+
+```js
+const people = ['Ali', 'John', 'Chrystal', 'Doug', 'Christopher']
+return (
+  <span>{people.join(', ')}</span>
+)
+```
+
+```notes
+Everything inside the curly braces is "Just JavaScript". That means we can use
+"Just JavaScript" to manipulate our data. We don't have to learn a proxy via a
+templating language like Pug.
+```
+
+---
+
+## React Components
+
+```js
+import React from 'react'
+
+function HelloWorld() {
+  return (
+    <div>Hello World</div>
+  )
+}
+```
+
+We'd use that component like this:
+
+```js
+<HelloWorld />
+```
+
+---
+
+export default Split
+
+<div>
+Our component:
+
+```js
+function HelloWorld() {
+  return (
+    <div className="hello">
+      <b>Hello World</b>
+    </div>
+  )
+}
+```
+</div>
+
+<div>
+Becomes:
+
+```js
+{
+  type: 'div',
+  props: {
+    className: 'hello',
+    children: {
+      type: 'b',
+      children: 'Hello World'
+    }
+  }
+}
+```
+</div>
+
+```notes
+React components return React "elements" which are Plain-Old JavaScript Objects
+which are lightweight "descriptions" of what we want the DOM to look like.
+
+They are much cheaper to create and update than "real" DOM elements. This is
+really important later when we look at how React updates the DOM.
+```
+
+---
+
+## Props
+
+```js
+<Greeting greeting="Hi" />
+```
+
+```js
+const Greeting = (props) => (
+  <span>{props.greeting}</span>
+)
+```
+
+```notes
+Props are like "arguments" to components. It's how we pass data down the
+component tree
+```
+
+---
+
+## Class Components
+
+```js
+import React, { Component } from 'react'
+
+export default class Greeting extends Component {
+  render() {
+    return (
+      <div>Hello {this.props.greeting}</div>
+    )
+  }
+}
+```
+
+```notes
+So far we've looked at the simplest type of components, not much more useful
+than a templating language. However React has special Super Powers™️ that are
+enabled through the Component class.
+
+To convert a functional component (what we have seen so far) into a class
+component, it's mostly just copy/pasting the function into the `render` method
+of the class. Props are accessed via this.props
+```
+
+---
+
+## Accessing the Super Powers™️
+
+<div style={{ fontSize: 20 }}>
+
+```js
+class Counter extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { count: 0 }
+  }
+  increment = () => {
+    this.setState((prevState) => {
+      return { count: prevState.count + 1 }
+    })
+  }
+  render() {
+    return (
+      <div>
+        Count: {this.state.count}
+        <button onClick={this.increment}>Click me!</button>
+      </div>
+    )
+  }
+}
+```
+
+</div>
+
+[Demo](https://codesandbox.io/s/mqp753xr19)
+
+```notes
+Ok, so there's a lot going on here.
+
+Firstly, we've added some "state". This is one of the class component Super
+Powers™️. We initialise that state in the class `constructor` to set the `count`
+to zero.
+
+Inside our `render` method, we display the current count with
+`this.state.count`. We also have a button that has a special `onClick` prop that
+is passed a reference to the `increment` method. Note the difference between
+Angular and React: in Angular you give call the function in an `ng-click`. In
+React, you pass the function reference for React to call for you.
+
+The `increment` method calls a "magic" `this.setState` method (that is provided
+by the React component). This does 2 things: It updates the state so that our
+count is increment. But now our UI is out of date! It's still showing the
+previous count.
+
+This is the second function of `this.setState`: it tells React that our UI is
+dirty and needs to be updated. This is where the process of "reconciliation"
+comes in.
+```
+
+---
+
+## Reconciliation
+
+![Reconciliation diagram](./reconciliation.png)
+
+```notes
+The simplest thing it could do is to throw away the entire DOM and rebuild it
+from scratch. This is in fact exactly what the first (internal) version of React
+did!
+
+This has obvious performance problems. Instead React follows a tree diff
+algorithm between the "real" DOM and our "description" of the DOM, via React
+elements. Once it knows what is different it efficiently updates only the nodes
+which need changing.
+```
+
+---
+
+## UI becomes a function of a component and data
+
+<div style={{ fontSize: 80, marginTop: '5%' }}>
+(component, data) => UI
+</div>
+
+```notes
+You have to squint a little to be able to see this, but what I mean is that
+given a component and data, it is guaranteed to always render the same UI every
+time.
+
+This - to me - is the core useful thing about React. It frees us from having to
+manage the DOM as it changes over time. If we update the data, the React will
+change the UI to match.
+```
